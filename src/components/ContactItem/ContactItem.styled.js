@@ -6,4 +6,8 @@ export const ListItemStyled = styled.li`
   display: flex;
   align-items: center;
   gap: 25px;
+
+  border: 1px solid rgb(216, 216, 216, 0.5);
+  border-radius: 10px;
+  padding: 5px 10px;
 `;

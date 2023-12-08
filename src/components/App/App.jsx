@@ -1,8 +1,9 @@
-import React from 'react';
-import { Component } from 'react';
+import React, { useEffect, useState } from 'react';
+// import { Component } from 'react';
 import { Notify } from 'notiflix/build/notiflix-notify-aio';
 
-import { Conatiner, Note } from './App.styled';
+import { Conatiner, MainWrapper, Note } from './App.styled';
+import { Header } from 'components/Header/Header';
 import { ContactList } from 'components/ContactList/ContactList';
 import { Filter } from 'components/Filter/Filter';
 import { ContactForm } from 'components/ContactForm/ContactForm';
@@ -12,75 +13,58 @@ import {
   setContactsToLocalStorage,
 } from 'helpers';
 
-export class App extends Component {
-  state = {
-    contacts: [],
-    filter: '',
+export function App() {
+  const [contacts, setContacts] = useState(getContactsFromLocalStorage());
+  const [filter, setFilter] = useState('');
+
+  useEffect(() => {
+    setContactsToLocalStorage(contacts);
+  }, [contacts]);
+
+  const deliteContact = id => {
+    const filtered = contacts.filter(contact => contact.id !== id);
+    setContacts(filtered);
   };
 
-  componentDidMount() {
-    const localStorageContacts = getContactsFromLocalStorage();
-    this.setState({ contacts: localStorageContacts });
-  }
-
-  componentDidUpdate(prevProps, prevState) {
-    if (this.state.contacts.length !== prevState.contacts.length) {
-      setContactsToLocalStorage(this.state.contacts);
-    }
-  }
-
-  deliteContact = id => {
-    this.setState(prev => ({
-      contacts: prev.contacts.filter(item => item.id !== id),
-    }));
-  };
-  handleChangeFilter = e => {
-    this.setState({ filter: e.currentTarget.value });
-  };
-
-  filerContact = () => {
-    return this.state.contacts.filter(contact =>
-      contact.name.toLowerCase().includes(this.state.filter.toLowerCase())
+  const filerContact = () => {
+    return contacts.filter(contact =>
+      contact.name.toLowerCase().includes(filter.toLowerCase())
     );
   };
-
-  // !это  передаю пропсом в КонтактФорм
-  formSubmitData = data => {
-    this.state.contacts.some(element => element.name === data.name)
-      ? Notify.info(`Contact with name ${data.name} already exists!`)
-      : this.setState({
-          contacts: [...this.state.contacts, data],
-        });
+  const handleChangeFilter = e => {
+    console.log(e.currentTarget.value);
+    setFilter(e.currentTarget.value);
   };
 
-  render() {
-    const { filter, contacts } = this.state;
-    return (
-      <>
-        <Conatiner>
-          <h1>Phonebook</h1>
-          <ContactForm onSubmit={this.formSubmitData} />
+  const formSubmitData = data => {
+    setContacts(prevContacts => {
+      if (prevContacts.some(element => element.name === data.name)) {
+        Notify.info(`Контакт с именем ${data.name} уже существует!`);
+        return prevContacts;
+      }
+      return [...prevContacts, data];
+    });
+  };
+
+  return (
+    <>
+      <Conatiner>
+        <Header>
+          <Filter value={filter} onFilterInputChange={handleChangeFilter} />
+        </Header>
+        <MainWrapper className={contacts.length === 0 ? 'empty' : ''}>
+          <ContactForm onSubmit={formSubmitData}></ContactForm>
 
           {contacts.length === 0 ? (
-            <>
-              <Note>Your phonebook is empty! Add a contact</Note>
-            </>
+            <Note>Your phonebook is empty! Add a contact.</Note>
           ) : (
-            <>
-              <h2>Contacts</h2>
-              <Filter
-                value={filter}
-                onFilterInputChange={this.handleChangeFilter}
-              />
-
-              <ContactList
-                contacts={this.filerContact()}
-                onDeliteContact={this.deliteContact}
-              />
-            </>
+            <ContactList
+              contacts={filerContact()}
+              onDeliteContact={deliteContact}
+            />
           )}
-        </Conatiner>
-      </>
-    );
-  }
+        </MainWrapper>
+      </Conatiner>
+    </>
+  );
 }

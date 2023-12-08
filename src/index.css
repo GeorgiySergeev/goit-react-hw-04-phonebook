@@ -1,21 +1,8 @@
 @import-normalize; /* bring in normalize.css styles */
 
 body {
-  margin: 0;
-  font-family: 'DM Sans', sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  background-color: rgb(255, 255, 255);
-}
+  color: rgb(47, 46, 45);
 
-code {
-  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
-    monospace;
-}
-
-@import-normalize; /* bring in normalize.css styles */
-
-body {
   margin: 0;
   font-family: 'DM Sans', sans-serif;
   -webkit-font-smoothing: antialiased;
@@ -61,4 +48,8 @@ button {
 img {
   display: block;
   max-width: 100%;
+}
+
+.empty {
+  justify-content: start !important;
 }
